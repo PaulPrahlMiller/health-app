@@ -1,0 +1,8 @@
+task downloadMobileBERTTextClassifierModel(type: Download) {
+    src 'https://storage.googleapis.com/download.tensorflow' +
+            '.org/models/tflite/task_library/text_classification/android/mobilebert.tflite'
+    dest project.ext.ASSET_DIR + '/mobilebert.tflite'
+    overwrite false
+}
+
+preBuild.dependsOn downloadMobileBERTTextClassifierModel
