@@ -23,6 +23,7 @@ import com.hkr.health.HealthDestinations.QUESTIONS_ROUTE
 import com.hkr.health.HealthDestinations.ANALYSIS_ROUTE
 import com.hkr.health.HealthDestinations.QUESTION_ITEM_ARG
 import com.hkr.health.HealthDestinations.QUESTION_ITEM_ROUTE
+import com.hkr.health.data.Answer
 import com.hkr.health.ui.screens.Analysis
 import com.hkr.health.ui.screens.Home
 import com.hkr.health.ui.screens.QuestionItemScreen
@@ -94,7 +95,11 @@ fun HealthNavGraph(
                         onQuestionClick = { category -> navActions.navigateToQuestionItem(category) }
                     )
                 }
-                composable(ANALYSIS_ROUTE) { Analysis() }
+                composable(ANALYSIS_ROUTE) {
+                    Analysis(
+                        answers = healthViewModel.answers.observeAsState() as State<List<Answer>>
+                    )
+                }
                 composable(
                     "$QUESTION_ITEM_ROUTE/{$QUESTION_ITEM_ARG}",
                     arguments = listOf(
@@ -110,6 +115,7 @@ fun HealthNavGraph(
                         answers = answers,
                         answerInput = healthViewModel.answerInput,
                         onUserAnswerChange = { healthViewModel.updateAnswerInput(it) },
+                        onBackPress = { navActions.navigateToQuestions() },
                         onSubmitClick = {
                             if(healthViewModel.answerInput != ""){
                                 healthViewModel.insertAnswer(category)

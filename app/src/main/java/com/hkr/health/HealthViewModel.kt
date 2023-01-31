@@ -28,7 +28,9 @@ class HealthViewModel(application: Application, private val classifier: BertNLCl
         val answersDb = AnswersDatabase.getInstance(application)
         val answersDao = answersDb.answersDao()
         answersRepository = AnswersRepository(answersDao)
-        _answers.value = answersRepository.answers
+        viewModelScope.launch {
+            _answers.value = answersRepository.getAnswers()
+        }
     }
 
     fun updateAnswerInput(text: String) {

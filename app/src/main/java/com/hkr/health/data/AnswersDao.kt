@@ -7,12 +7,12 @@ import androidx.room.*
 interface AnswersDao {
 
     @Query("SELECT * FROM answers")
-    fun getAnswers(): List<Answer>
+    suspend fun getAnswers(): List<Answer>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAnswer(vararg answer: Answer)
+    suspend fun insertAnswer(vararg answer: Answer)
 
     @Delete
-    fun deleteAnswer(vararg answer: Answer)
+    suspend fun deleteAnswer(vararg answer: Answer)
 
 }

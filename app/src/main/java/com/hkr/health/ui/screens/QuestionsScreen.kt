@@ -53,6 +53,9 @@ fun CardContent(category: String) {
             contentDescription = null,
             modifier = Modifier
                 .padding(start = 20.dp)
+                .clickable {
+
+                }
         )
         Text(
             text = category.replaceFirstChar(Char::uppercase),

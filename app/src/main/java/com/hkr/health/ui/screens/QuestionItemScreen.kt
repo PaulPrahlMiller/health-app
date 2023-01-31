@@ -1,5 +1,6 @@
 package com.hkr.health.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,7 +25,8 @@ fun QuestionItemScreen(
     answers: List<Answer>,
     questions: Map<String, String>,
     onUserAnswerChange: (String) -> Unit,
-    onSubmitClick: (String) -> Unit
+    onSubmitClick: (String) -> Unit,
+    onBackPress: () -> Unit
 ) {
 
     val answer = answers.find { answer -> answer.category == category }
@@ -45,12 +47,6 @@ fun QuestionItemScreen(
                     modifier = Modifier
                         .padding(bottom = 10.dp)
                         .weight(1f)
-                )
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(end = 10.dp)
                 )
             }
             Text(
