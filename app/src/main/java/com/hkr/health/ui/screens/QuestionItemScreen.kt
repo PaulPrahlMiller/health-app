@@ -48,9 +48,18 @@ fun QuestionItemScreen(
                         .padding(bottom = 10.dp)
                         .weight(1f)
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back button",
+                    modifier = Modifier
+                        .clickable {
+                            onBackPress()
+                        }
+                )
             }
             Text(
-                text = questions[category]!!,
+                text = questions[category] ?: "",
                 modifier = Modifier
                     .padding(bottom = 20.dp)
             )

@@ -10,35 +10,27 @@ import com.hkr.health.HealthDestinations.QUESTION_ITEM_ROUTE
 class HealthNavigationActions(private val navController: NavController) {
 
     fun navigateToHome() {
-        navigateWithPopSingleTop(HOME_ROUTE)
+        navController.navigate(HOME_ROUTE) {
+            launchSingleTop = true
+        }
     }
 
     fun navigateToQuestions() {
-        navigateWithPopSingleTop(QUESTIONS_ROUTE)
+        navController.navigate(QUESTIONS_ROUTE){
+            launchSingleTop = true
+        }
     }
 
     fun navigateToAnalysis() {
-        navigateWithPopSingleTop(ANALYSIS_ROUTE)
+        navController.navigate(ANALYSIS_ROUTE){
+            launchSingleTop = true
+        }
     }
 
     fun navigateToQuestionItem(category: String) {
         navController.navigate("$QUESTION_ITEM_ROUTE/$category")
     }
 
-    private fun navigateWithPopSingleTop(route: String) {
-        navController.navigate(route){
-            // Pop up to start destination to prevent building
-            // a large stack of destinations
-            popUpTo(navController.graph.findStartDestination().id) {
-                saveState = true
-            }
-            // Avoid multiple copies of the same destination on
-            // top of the nav stack
-            launchSingleTop = true
-            // Restore state when reselecting a previously selected route
-            restoreState = true
-        }
-    }
 }
 
 object HealthDestinations {
