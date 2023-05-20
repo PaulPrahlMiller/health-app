@@ -1,4 +1,4 @@
-package com.hkr.health
+package com.hkr.health.ui.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -7,7 +7,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,17 +17,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.hkr.health.HealthDestinations.HOME_ROUTE
-import com.hkr.health.HealthDestinations.QUESTIONS_ROUTE
-import com.hkr.health.HealthDestinations.ANALYSIS_ROUTE
-import com.hkr.health.HealthDestinations.QUESTION_ITEM_ARG
-import com.hkr.health.HealthDestinations.QUESTION_ITEM_ROUTE
-import com.hkr.health.data.Answer
-import com.hkr.health.ui.screens.Analysis
-import com.hkr.health.ui.screens.Home
-import com.hkr.health.ui.screens.QuestionItemScreen
-import com.hkr.health.ui.screens.Questions
-
+import com.hkr.health.AppContainer
+import com.hkr.health.ui.navigation.HealthDestinations.HOME_ROUTE
+import com.hkr.health.ui.navigation.HealthDestinations.QUESTIONS_ROUTE
+import com.hkr.health.ui.navigation.HealthDestinations.ANALYSIS_ROUTE
+import com.hkr.health.ui.navigation.HealthDestinations.QUESTION_ITEM_ARG
+import com.hkr.health.ui.navigation.HealthDestinations.QUESTION_ITEM_ROUTE
+import com.hkr.health.ui.screens.analysis.Analysis
+import com.hkr.health.ui.screens.analysis.AnalysisViewModel
+import com.hkr.health.ui.screens.home.Home
+import com.hkr.health.ui.screens.questionItem.QuestionItemScreen
+import com.hkr.health.ui.screens.questions.Questions
+import com.hkr.health.ui.screens.questions.QuestionsViewModel
 @Composable
 fun HealthNavGraph(
     modifier: Modifier = Modifier,
@@ -37,8 +37,7 @@ fun HealthNavGraph(
     navActions: HealthNavigationActions = remember(navController) {
         HealthNavigationActions(navController)
     },
-    healthViewModel: HealthViewModel
-
+    viewModel: QuestionsViewModel
 ) {
     val currentNavBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentNavBackStackEntry?.destination?.route ?: startDestination
@@ -91,14 +90,12 @@ fun HealthNavGraph(
                 composable(HOME_ROUTE) { Home() }
                 composable(QUESTIONS_ROUTE) {
                     Questions(
-                        categories = healthViewModel.categories,
+                        viewModel = viewModel,
                         onQuestionClick = { category -> navActions.navigateToQuestionItem(category) }
                     )
                 }
                 composable(ANALYSIS_ROUTE) {
-                    Analysis(
-                        answers = healthViewModel.answers.observeAsState() as State<List<Answer>>
-                    )
+                    Analysis(viewModel = viewModel)
                 }
                 composable(
                     "$QUESTION_ITEM_ROUTE/{$QUESTION_ITEM_ARG}",
@@ -106,22 +103,11 @@ fun HealthNavGraph(
                         navArgument(QUESTION_ITEM_ARG){ type = NavType.StringType }
                     )
                 ) { entry ->
-                    val category = entry.arguments?.getString(QUESTION_ITEM_ARG)!!
-                    val answers by healthViewModel.answers.observeAsState(listOf())
-
+                    val category = entry.arguments?.getString(QUESTION_ITEM_ARG) ?: ""
                     QuestionItemScreen(
-                        category,
-                        questions = healthViewModel.questions,
-                        answers = answers,
-                        answerInput = healthViewModel.answerInput,
-                        onUserAnswerChange = { healthViewModel.updateAnswerInput(it) },
-                        onBackPress = { navActions.navigateToQuestions() },
-                        onSubmitClick = {
-                            if(healthViewModel.answerInput != ""){
-                                healthViewModel.insertAnswer(category)
-                                navActions.navigateToQuestions()
-                            }
-                        }
+                        viewModel = viewModel,
+                        category = category,
+                        onBackClick = { navActions.popUpToQuestions() }
                     )
                 }
             }

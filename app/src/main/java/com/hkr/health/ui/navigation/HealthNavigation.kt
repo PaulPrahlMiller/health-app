@@ -1,11 +1,10 @@
-package com.hkr.health
+package com.hkr.health.ui.navigation
 
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.hkr.health.HealthDestinations.ANALYSIS_ROUTE
-import com.hkr.health.HealthDestinations.HOME_ROUTE
-import com.hkr.health.HealthDestinations.QUESTIONS_ROUTE
-import com.hkr.health.HealthDestinations.QUESTION_ITEM_ROUTE
+import com.hkr.health.ui.navigation.HealthDestinations.ANALYSIS_ROUTE
+import com.hkr.health.ui.navigation.HealthDestinations.HOME_ROUTE
+import com.hkr.health.ui.navigation.HealthDestinations.QUESTIONS_ROUTE
+import com.hkr.health.ui.navigation.HealthDestinations.QUESTION_ITEM_ROUTE
 
 class HealthNavigationActions(private val navController: NavController) {
 
@@ -31,6 +30,12 @@ class HealthNavigationActions(private val navController: NavController) {
         navController.navigate("$QUESTION_ITEM_ROUTE/$category")
     }
 
+    fun popUpToQuestions() {
+        navController.navigate(QUESTIONS_ROUTE) {
+            launchSingleTop = true
+            popUpTo(QUESTIONS_ROUTE)
+        }
+    }
 }
 
 object HealthDestinations {

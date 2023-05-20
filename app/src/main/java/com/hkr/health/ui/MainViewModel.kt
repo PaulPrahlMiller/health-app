@@ -1,6 +1,5 @@
-package com.hkr.health
+package com.hkr.health.ui
 
-import android.app.Application
 import androidx.compose.runtime.*
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,14 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.hkr.health.data.Answer
-import com.hkr.health.data.AnswersDatabase
 import com.hkr.health.data.AnswersRepository
 import kotlinx.coroutines.launch
 import org.tensorflow.lite.task.text.nlclassifier.BertNLClassifier
 
-class HealthViewModel(application: Application, private val classifier: BertNLClassifier) : ViewModel() {
-
-    private val answersRepository: AnswersRepository
+class MainViewModel(private val answersRepository: AnswersRepository, private val classifier: BertNLClassifier) : ViewModel() {
 
     private val _answers= MutableLiveData<List<Answer>>()
     val answers: LiveData<List<Answer>>
@@ -24,25 +20,16 @@ class HealthViewModel(application: Application, private val classifier: BertNLCl
     var answerInput by mutableStateOf("")
         private set
 
-    init {
-        val answersDb = AnswersDatabase.getInstance(application)
-        val answersDao = answersDb.answersDao()
-        answersRepository = AnswersRepository(answersDao)
-        viewModelScope.launch {
-            _answers.value = answersRepository.getAnswers()
-        }
-    }
-
     fun updateAnswerInput(text: String) {
         answerInput = text
     }
 
-    fun insertAnswer(category: String) {
+    fun insertAnswer(category: String, answer: String) {
         viewModelScope.launch {
             val (result, score) = classifyUserInput(answerInput)
-            val newAnswer = Answer(category, answerInput, result, score)
+            val newAnswer = Answer(category, answer, result, score)
             answerInput = ""
-            answersRepository.insertAnswer(newAnswer)
+            answersRepository.insertAnswer(category, "newAnswer")
         }
     }
 
@@ -69,24 +56,18 @@ class HealthViewModel(application: Application, private val classifier: BertNLCl
 
     }
 
-    val questions: Map<String, String> = mapOf(
-        "alcohol" to "How do your drinking habits affect your day to day life?",
-        "nutrition" to "Have you been eating a healthy and balanced diet?",
-        "sleep" to "How have you been sleeping recently?",
-        "stress" to "How has stress affected you recently?"
-    )
 
-    val categories: List<String> = listOf(
-        "alcohol",
-        "nutrition",
-        "sleep",
-        "stress"
-    )
-}
 
-class HealthViewModelFactory(private val application: Application, private val classifier: BertNLClassifier) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return HealthViewModel(application, classifier) as T
+
+
+    companion object {
+        fun provideFactory(
+            answersRepository: AnswersRepository,
+            classifier: BertNLClassifier
+        ) : ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return MainViewModel(answersRepository, classifier) as T
+            }
+        }
     }
 }
